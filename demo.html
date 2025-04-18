@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brandora Demo - AI-Powered Influencer-Brand Matching</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3FA7A7;
+            --primary-dark: #2E4E4E;
+            --secondary: #A3C7C7;
+            --accent: #3FA7A7;
+            --dark: #2E4E4E;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --bg-color: #f8fafc;
+            --text-color: #2E4E4E;
+            --card-bg: white;
+            --header-bg: white;
+        }
+        
+        [data-theme="dark"] {
+            --primary: #3FA7A7;
+            --primary-dark: #A3C7C7;
+            --bg-color: #1a1a2e;
+            --text-color: #f8fafc;
+            --card-bg: #282840;
+            --gray: #a0aec0;
+            --gray-light: #4a5568;
+            --header-bg: #282840;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background-color: var(--header-bg);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            transition: background-color 0.3s;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            margin-right: 30px;
+        }
+        
+        .logo img {
+            height: 40px;
+            margin-right: 8px;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        /* Toggle Switches */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .toggle-label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--gray-light);
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+        
+        /* View Toggle */
+        .view-toggle {
+            padding: 8px 12px;
+            background-color: var(--gray-light);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .view-option {
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .view-option.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .dashboard {
+            padding: 100px 0 50px;
+            transition: all 0.3s;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-top: 30px;
+        }
+        
+        .dashboard-header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .dashboard-title {
+            font-size: 28px;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+        
+        .preview-toggle {
+            display: flex;
+            gap: 5px;
+            margin-left: 20px;
+        }
+        
+        .preview-btn {
+            background: var(--gray-light);
+            border: none;
+            color: var(--text-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .preview-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .onboarding-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            transition: background-color 0.3s;
+        }
+        
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        .tab.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        /* Panels */
+        .panel {
+            display: none;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 30px;
+            transition: background-color 0.3s;
+        }
+        
+        .panel.active {
+            display: block;
+        }
+        
+        .panel-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        /* Location Filter */
+        .location-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .location-filter select {
+            padding: 10px;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+        
+        /* Influencer Cards */
+        .influencer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .influencer-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s, background-color 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .influencer-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .influencer-banner {
+            height: 100px;
+            background: linear-gradient(135deg, #3FA7A7 0%, #2E4E4E 100%);
+        }
+        
+        .influencer-profile {
+            display: flex;
+            align-items: flex-end;
+            margin-top: -40px;
+            padding: 0 20px;
+        }
+        
+        .influencer-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid var(--card-bg);
+            background-color: var(--gray-light);
+            overflow: hidden;
+            transition: border-color 0.3s;
+            position: relative;
+        }
+        
+        .influencer-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .influencer-badges {
+            position: absolute;
+            top: 100px;
+            right: 15px;
+            display: flex;
+            gap: 5px;
+        }
+        
+        .badge-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+        
+        .badge-verified {
+            background-color: #3b82f6;
+        }
+        
+        .badge-rising {
+            background-color: #f59e0b;
+        }
+        
+        .badge-top {
+            background-color: #10b981;
+        }
+        
+        .influencer-details {
+            padding: 20px;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+        
+        .influencer-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .influencer-category {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .influencer-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-weight: 700;
+            font-size: 18px;
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-size: 12px;
+        }
+        
+        .influencer-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .tag {
+            background-color: var(--secondary);
+            color: var(--dark);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+        
+        .match-score {
+            background-color: var(--bg-color);
+            border-radius: 5px;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        
+        .match-label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .match-value {
+            background-color: var(--primary);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: 700;
+        }
+        
+        .commission-info {
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--gray);
+            text-align: right;
+        }
+        
+        /* Chart & Analytics */
+        .chart-container {
+            height: 400px;
+            margin-bottom: 30px;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            transition: background-color 0.3s;
+        }
+        
+        .metrics {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .metric-card {
+            background-color: var(--card-bg);
+            flex: 1;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: background-color 0.3s;
+        }
+        
+        .metric-card h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: var(--gray);
+        }
+        
+        .metric-card .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+        
+        .trend-up {
+            color: #10b981;
+        }
+        
+        .trend-down {
+            color: #ef4444;
+        }
+        
+        /* Search & Filters */
+        .search-box {
+            padding: 12px 15px;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            width: 100%;
+            margin-bottom: 20px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter {
+            padding: 10px 15px;
+            background-color: var(--bg-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            color: var(--text-color);
+        }
+        
+        .filter.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        /* Campaigns */
+        .campaign-list {
+            margin-top: 20px;
+        }
+        
+        .campaign-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid var(--gray-light);
+            transition: border-color 0.3s;
+        }
+        
+        .campaign-info h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+        
+        .campaign-info p {
+            color: var(--gray);
+        }
+        
+        .campaign-stats {
+            display: flex;
+            gap: 20px;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+        
+        .badge-warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+        
+        .badge-danger {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+        
+        /* Trends */
+        .trend-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+        
+        .trend-card h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+        
+        .trend-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--gray-light);
+            transition: border-color 0.3s;
+        }
+        
+        .trend-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .trend-name {
+            font-weight: 600;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+        
+        .trend-growth {
+            color: #10b981;
+            margin-left: auto;
+            font-weight: 600;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background-color: var(--card-bg);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .btn-secondary:hover {
+            background-color: rgba(63, 167, 167, 0.05);
+        }
+        
+        .btn-large {
+            padding: 16px 32px;
+            font-size: 18px;
+        }
+        
+        /* Mobile Preview Mode */
+        .mobile-preview-active .dashboard {
+            max-width: 420px;
+            margin: 0 auto;
+            padding: 80px 0 30px;
+            border: 10px solid #2E4E4E;
+            border-radius: 30px;
+            position: relative;
+            height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+        
+        .mobile-preview-active .mobile-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 30px;
+            background-color: #2E4E4E;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+        }
+        
+        .mobile-notch {
+            display: none;
+        }
+        
+        .mobile-preview-active .mobile-notch {
+            display: block;
+        }
+        
+        /* Tour Steps */
+        .tour-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .tour-step {
+            position: absolute;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 300px;
+            z-index: 1001;
+            display: none;
+        }
+        
+        .tour-step h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .tour-step p {
+            margin-bottom: 15px;
+        }
+        
+        .tour-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 992px) {
+            .header-container {
+                flex-wrap: wrap;
+            }
+            
+            .view-toggle {
+                margin-top: 10px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .influencer-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics {
+                flex-direction: column;
+            }
+            
+            .header-right {
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 10px;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                flex: 1;
+                text-align: center;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                min-width: 100px;
+            }
+            
+            .campaign-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .campaign-stats {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="header-left">
+                <a href="index.html" class="logo">
+                    <img src="logo.png" alt="Brandora Logo">
+                    Brandora
+                </a>
+                
+                <div class="view-toggle">
+                    <div class="view-option active" data-view="brand">Brand</div>
+                    <div class="view-option" data-view="influencer">Influencer</div>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <div class="toggle-container">
+                    <i class="fas fa-sun"></i>
+                    <label class="switch">
+                        <input type="checkbox" id="theme-toggle">
+                        <span class="slider"></span>
+                    </label>
+                    <i class="fas fa-moon"></i>
+                </div>
+                
+                <button id="start-tour" class="btn btn-secondary onboarding-btn">
+                    <i class="fas fa-route"></i> Quick Tour
+                </button>
+                
+                <div>
+                    <span id="user-name" style="margin-right: 15px; font-weight: 600;">Demo User</span>
+                    <a href="index.html" class="btn btn-secondary">Exit Demo</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard">
+        <div class="mobile-notch"></div>
+        <div class="container">
+            <div class="dashboard-header">
+                <div class="dashboard-header-left">
+                    <h1 class="dashboard-title">Brand Dashboard</h1>
+                    <div class="preview-toggle">
+                        <button class="preview-btn active" id="desktop-view" title="Desktop View">
+                            <i class="fas fa-desktop"></i>
+                        </button>
+                        <button class="preview-btn" id="mobile-view" title="Mobile View">
+                            <i class="fas fa-mobile-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="create-campaign">Create Campaign</button>
+            </div>
+            
+            <div class="tabs">
+                <div class="tab active" data-tab="discover">Discover Influencers</div>
+                <div class="tab" data-tab="campaigns">Campaigns</div>
+                <div class="tab" data-tab="analytics">Analytics</div>
+                <div class="tab" data-tab="trends">Trend Tracking</div>
+            </div>
+            
+            <div id="discover" class="panel active">
+                <div class="panel-header">
+                    <div class="panel-title">AI-Matched Influencers for Your Brand</div>
+                </div>
+                
+                <input type="text" class="search-box" placeholder="Search influencers by name, niche, or location...">
+                
+                <div class="location-filter">
+                    <select id="region-select">
+                        <option value="">All Regions</option>
+                        <option value="north-america">North America</option>
+                        <option value="europe">Europe</option>
+                        <option value="asia">Asia-Pacific</option>
+                        <option value="latam">Latin America</option>
+                        <option value="africa">Africa</option>
+                    </select>
+                    
+                    <select id="country-select">
+                        <option value="">All Countries</option>
+                        <option value="usa">United States</option>
+                        <option value="canada">Canada</option>
+                        <option value="uk">United Kingdom</option>
+                        <option value="france">France</option>
+                        <option value="germany">Germany</option>
+                        <option value="japan">Japan</option>
+                        <option value="brazil">Brazil</option>
+                        <option value="australia">Australia</option>
+                    </select>
+                </div>
+                
+                <div class="filters">
+                    <div class="filter active">All</div>
+                    <div class="filter">Micro (1K-10K)</div>
+                    <div class="filter">Mid-tier (10K-100K)</div>
+                    <div class="filter">Macro (100K+)</div>
+                    <div class="filter">Local</div>
+                    <div class="filter">Global</div>
+                </div>
+                
+                <div class="influencer-grid" id="influencer-grid">
+                    <!-- Influencer cards will be dynamically generated -->
+                </div>
+            </div>
+            
+            <div id="campaigns" class="panel">
+                <div class="panel-title">Active Campaigns</div>
+                
+                <div class="campaign-list">
+                    <div class="campaign-item">
+                        <div class="campaign-info">
+                            <h3>Summer Product Launch</h3>
+                            <p>8 influencers · Ends in 12 days</p>
+                        </div>
+                        <div class="campaign-stats">
+                            <div>
+                                <strong>357K</strong>
+                                <div>Impressions</div>
+                            </div>
+                            <div>
+                                <strong>4.7%</strong>
+                                <div>Engagement</div>
+                            </div>
+                            <div>
+                                <strong>$0.14</strong>
+                                <div>Cost per Engagement</div>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="badge badge-success">Active</span>
+                            <div class="commission-info">Platform fee: 5% ($247.50)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="campaign-item">
+                        <div class="campaign-info">
+                            <h3>Back to School</h3>
+                            <p>5 influencers · Starts in 3 days</p>
+                        </div>
+                        <div class="campaign-stats">
+                            <div>
+                                <strong>--</strong>
+                                <div>Impressions</div>
+                            </div>
+                            <div>
+                                <strong>--</strong>
+                                <div>Engagement</div>
+                            </div>
+                            <div>
+                                <strong>--</strong>
+                                <div>Cost per Engagement</div>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="badge badge-warning">Scheduled</span>
+                            <div class="commission-info">Est. platform fee: 5% ($175.00)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="campaign-item">
+                        <div class="campaign-info">
+                            <h3>Spring Collection</h3>
+                            <p>12 influencers · Ended 14 days ago</p>
+                        </div>
+                        <div class="campaign-stats">
+                            <div>
+                                <strong>892K</strong>
+                                <div>Impressions</div>
+                            </div>
+                            <div>
+                                <strong>5.2%</strong>
+                                <div>Engagement</div>
+                            </div>
+                            <div>
+                                <strong>$0.11</strong>
+                                <div>Cost per Engagement</div>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="badge badge-danger">Completed</span>
+                            <div class="commission-info">Platform fee: 5% ($412.80)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="analytics" class="panel">
+                <div class="panel-title">Campaign Performance Analytics</div>
+                
+                <div class="chart-container">
+                    <canvas id="performance-chart"></canvas>
+                </div>
+                
+                <div class="metrics">
+                    <div class="metric-card">
+                        <h3>Total Reach</h3>
+                        <div class="value">1.4M</div>
+                        <small class="trend-up">↑ 23% vs. last month</small>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Engagement Rate</h3>
+                        <div class="value">4.9%</div>
+                        <small class="trend-up">↑ 0.8% vs. last month</small>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Conversion Rate</h3>
+                        <div class="value">2.3%</div>
+                        <small class="trend-up">↑ 0.5% vs. last month</small>
+                    </div>
+                    <div class="metric-card">
+                        <h3>ROI</h3>
+                        <div class="value">3.2x</div>
+                        <small class="trend-up">↑ 0.4x vs. last month</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="trends" class="panel">
+                <div class="panel-title">Emerging Trends & Opportunities</div>
+                
+                <div class="trend-card">
+                    <h3>Trending Topics in Your Industry</h3>
+                    <div class="trend-item">
+                        <div class="trend-icon">
+                            <i class="fas fa-hashtag"></i>
+                        </div>
+                        <div>
+                            <div class="trend-name">Sustainable Fashion</div>
+                            <small>Growing rapidly among 18-24 demographic</small>
+                        </div>
+                        <div class="trend-growth">+43% in 30 days</div>
+                    </div>
+                    <div class="trend-item">
+                        <div class="trend-icon">
+                            <i class="fas fa-hashtag"></i>
+                        </div>
+                        <div>
+                            <div class="trend-name">Clean Beauty</div>
+                            <small>Rising engagement in North America region</small>
+                        </div>
+                        <div class="trend-growth">+28% in 30 days</div>
+                    </div>
+                    <div class="trend-item">
+                        <div class="trend-icon">
+                            <i class="fas fa-hashtag"></i>
+                        </div>
+                        <div>
+                            <div class="trend-name">Minimalist Living</div>
+                            <small>Gaining traction across multiple platforms</small>
+                        </div>
+                        <div class="trend-growth">+21% in 30 days</div>
+                    </div>
+                </div>
+                
+                <div class="trend-card">
+                    <h3>Rising Influencers to Watch</h3>
+                    <div class="trend-item">
+                        <div class="trend-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <div class="trend-name">@ecostyle_alex</div>
+                            <small>Sustainable lifestyle content, 25K followers</small>
+                        </div>
+                        <div class="trend-growth">+64% growth rate</div>
+                    </div>
+                    <div class="trend-item">
+                        <div class="trend-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <div class="trend-name">@fitfoodie.lisa</div>
+                            <small>Healthy recipes, 18K followers</small>
+                        </div>
+                        <div class="trend-growth">+52% growth rate</div>
+                    </div>
+                    <div class="trend-item">
+                        <div class="trend-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <div class="trend-name">@tech_with_jamie</div>
+                            <small>Tech reviews for eco-conscious products, 31K followers</small>
+                        </div>
+                        <div class="trend-growth">+47% growth rate</div>
+                    </div>
+                </div>
+                
+                <div class="trend-card">
+                    <h3>Content Format Trends</h3>
+                    <div class="trend-item">
+                        <div class="trend-icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <div>
+                            <div class="trend-name">Short-form Vertical Video</div>
+                            <small>Highest engagement across all platforms</small>
+                        </div>
+                        <div class="trend-growth">+78% engagement</div>
+                    </div>
+                    <div class="trend-item">
+                        <div class="trend-icon">
+                            <i class="fas fa-comment"></i>
+                        </div>
+                        <div>
+                            <div class="trend-name">Interactive Polls & Questions</div>
+                            <small>Growing participation metrics</small>
+                        </div>
+                        <div class="trend-growth">+35% engagement</div>
+                    </div>
+                    <div class="trend-item">
+                        <div class="trend-icon">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <div>
+                            <div class="trend-name">Live Shopping</div>
+                            <small>Rapidly growing conversion rates</small>
+                        </div>
+                        <div class="trend-growth">+41% engagement</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tour-overlay" id="tour-overlay"></div>
+    <div class="tour-step" id="tour-step-1">
+        <h3>Welcome to Brandora!</h3>
+        <p>This platform connects brands with the perfect influencers using AI-powered matching. Let's take a quick tour.</p>
+        <div class="tour-buttons">
+            <button class="btn btn-secondary tour-skip">Skip Tour</button>
+            <button class="btn btn-primary tour-next">Next</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab Navigation
+            const tabs = document.querySelectorAll('.tab');
+            const panels = document.querySelectorAll('.panel');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.dataset.tab;
+                    
+                    // Deactivate all tabs and panels
+                    tabs.forEach(t => t.classList.remove('active'));
+                    panels.forEach(p => p.classList.remove('active'));
+                    
+                    // Activate clicked tab and corresponding panel
+                    tab.classList.add('active');
+                    document.getElementById(target).classList.add('active');
+                });
+            });
+            
+            // Demo influencer data with badges and locations
+            const influencers = [
+                {
+                    id: 1,
+                    name: 'Sophia Chen',
+                    handle: '@eco.sophie',
+                    category: 'Sustainable Lifestyle',
+                    followers: '32.4K',
+                    engagement: '5.8%',
+                    posts: '428',
+                    tags: ['Sustainability', 'Vegan', 'Zero Waste'],
+                    matchScore: '94%',
+                    location: 'Portland, OR',
+                    audience: { female: 78, male: 22, age: '18-34' },
+                    badges: ['verified', 'rising'],
+                    region: 'north-america',
+                    country: 'usa'
+                },
+                {
+                    id: 2,
+                    name: 'Marcus Johnson',
+                    handle: '@urban.fitness',
+                    category: 'Fitness & Wellness',
+                    followers: '87.1K',
+                    engagement: '4.2%',
+                    posts: '693',
+                    tags: ['Fitness', 'Nutrition', 'Mental Health'],
+                    matchScore: '89%',
+                    location: 'Chicago, IL',
+                    audience: { female: 45, male: 55, age: '25-40' },
+                    badges: ['verified'],
+                    region: 'north-america',
+                    country: 'usa'
+                },
+                {
+                    id: 3,
+                    name: 'Aisha Rahman',
+                    handle: '@aisha.creates',
+                    category: 'DIY & Crafts',
+                    followers: '12.8K',
+                    engagement: '7.9%',
+                    posts: '246',
+                    tags: ['DIY', 'Home Decor', 'Crafting'],
+                    matchScore: '87%',
+                    location: 'London, UK',
+                    audience: { female: 82, male: 18, age: '24-45' },
+                    badges: ['rising'],
+                    region: 'europe',
+                    country: 'uk'
+                },
+                {
+                    id: 4,
+                    name: 'David Kim',
+                    handle: '@tech.david',
+                    category: 'Tech Reviews',
+                    followers: '156K',
+                    engagement: '3.8%',
+                    posts: '512',
+                    tags: ['Tech', 'Gadgets', 'Reviews'],
+                    matchScore: '85%',
+                    location: 'Tokyo, Japan',
+                    audience: { female: 35, male: 65, age: '18-35' },
+                    badges: ['verified', 'top'],
+                    region: 'asia',
+                    country: 'japan'
+                },
+                {
+                    id: 5,
+                    name: 'Elena Martinez',
+                    handle: '@travel.with.elena',
+                    category: 'Travel & Adventure',
+                    followers: '64.7K',
+                    engagement: '5.1%',
+                    posts: '378',
+                    tags: ['Travel', 'Photography', 'Culture'],
+                    matchScore: '82%',
+                    location: 'Rio de Janeiro, Brazil',
+                    audience: { female: 63, male: 37, age: '22-38' },
+                    badges: [],
+                    region: 'latam',
+                    country: 'brazil'
+                },
+                {
+                    id: 6,
+                    name: 'Jordan Taylor',
+                    handle: '@plant.based.j',
+                    category: 'Plant-Based Cooking',
+                    followers: '28.3K',
+                    engagement: '6.2%',
+                    posts: '291',
+                    tags: ['Vegan', 'Cooking', 'Recipes'],
+                    matchScore: '80%',
+                    location: 'Sydney, Australia',
+                    audience: { female: 68, male: 32, age: '25-45' },
+                    badges: ['rising'],
+                    region: 'asia',
+                    country: 'australia'
+                }
+            ];
+            
+            // Generate influencer cards
+            const influencerGrid = document.getElementById('influencer-grid');
+            
+            function renderInfluencers(filteredList = influencers) {
+                influencerGrid.innerHTML = '';
+                
+                filteredList.forEach(influencer => {
+                    const card = document.createElement('div');
+                    card.className = 'influencer-card';
+                    
+                    // Create badges HTML
+                    let badgesHTML = '';
+                    if (influencer.badges && influencer.badges.length > 0) {
+                        badgesHTML = '<div class="influencer-badges">';
+                        if (influencer.badges.includes('verified')) {
+                            badgesHTML += '<span class="badge-icon badge-verified" title="Verified Creator"><i class="fas fa-check"></i></span>';
+                        }
+                        if (influencer.badges.includes('rising')) {
+                            badgesHTML += '<span class="badge-icon badge-rising" title="Rising Star"><i class="fas fa-chart-line"></i></span>';
+                        }
+                        if (influencer.badges.includes('top')) {
+                            badgesHTML += '<span class="badge-icon badge-top" title="Top Performer"><i class="fas fa-award"></i></span>';
+                        }
+                        badgesHTML += '</div>';
+                    }
+                    
+                    card.innerHTML = `
+                        <div class="influencer-banner"></div>
+                        ${badgesHTML}
+                        <div class="influencer-profile">
+                            <div class="influencer-avatar">
+                                <img src="https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'women' : 'men'}/${Math.floor(Math.random() * 70) + 1}.jpg" alt="${influencer.name}">
+                            </div>
+                        </div>
+                        <div class="influencer-details">
+                            <div class="influencer-name">${influencer.name}</div>
+                            <div class="influencer-category">${influencer.handle} · ${influencer.category}</div>
+                            <div class="influencer-category"><i class="fas fa-map-marker-alt"></i> ${influencer.location}</div>
+                            <div class="influencer-stats">
+                                <div class="stat">
+                                    <div class="stat-value">${influencer.followers}</div>
+                                    <div class="stat-label">Followers</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-value">${influencer.engagement}</div>
+                                    <div class="stat-label">Engagement</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-value">${influencer.posts}</div>
+                                    <div class="stat-label">Posts</div>
+                                </div>
+                            </div>
+                            <div class="influencer-tags">
+                                ${influencer.tags.map(tag => `<div class="tag">${tag}</div>`).join('')}
+                            </div>
+                            <div class="match-score">
+                                <div class="match-label">AI Match Score</div>
+                                <div class="match-value">${influencer.matchScore}</div>
+                            </div>
+                            <div class="commission-info">Est. platform fee: 5% on collaboration</div>
+                        </div>
+                    `;
+                    influencerGrid.appendChild(card);
+                    
+                    // Add click event to show detailed profile modal
+                    card.addEventListener('click', () => {
+                        alert(`Viewing detailed profile for ${influencer.name}\n\nLocation: ${influencer.location}\nAudience Demographics: ${influencer.audience.female}% female, ${influencer.audience.male}% male\nAge Range: ${influencer.audience.age}\n\nThis would show a full analytics dashboard in the complete app.`);
+                    });
+                });
+            }
+            
+            renderInfluencers();
+            
+            // Performance Chart with dark mode compatibility
+            function createChart() {
+                if (document.getElementById('performance-chart')) {
+                    const ctx = document.getElementById('performance-chart').getContext('2d');
+                    
+                    if (window.myChart) window.myChart.destroy();
+                    
+                    window.myChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                            datasets: [
+                                {
+                                    label: 'Impressions (thousands)',
+                                    data: [120, 190, 230, 290, 320, 450],
+                                    borderColor: '#3FA7A7',
+                                    backgroundColor: 'rgba(63, 167, 167, 0.1)',
+                                    tension: 0.4,
+                                    fill: true
+                                },
+                                {
+                                    label: 'Engagement Rate (%)',
+                                    data: [3.2, 3.8, 4.1, 4.3, 4.7, 4.9],
+                                    borderColor: '#2E4E4E',
+                                    backgroundColor: 'rgba(46, 78, 78, 0.05)',
+                                    tension: 0.4,
+                                    fill: true
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: '6-Month Campaign Performance',
+                                    color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#f8fafc' : '#2E4E4E'
+                                },
+                                legend: {
+                                    labels: {
+                                        color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#f8fafc' : '#2E4E4E'
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    grid: {
+                                        color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#4a5568' : '#e2e8f0'
+                                    },
+                                    ticks: {
+                                        color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#f8fafc' : '#2E4E4E'
+                                    }
+                                },
+                                y: {
+                                    grid: {
+                                        color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#4a5568' : '#e2e8f0'
+                                    },
+                                    ticks: {
+                                        color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#f8fafc' : '#2E4E4E'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+            
+            createChart();
+            
+            // Dark Mode Toggle
+            const themeToggle = document.getElementById('theme-toggle');
+            themeToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                }
+                createChart();
+            });
+            
+            // View toggle (Brand/Influencer)
+            const viewOptions = document.querySelectorAll('.view-option');
+            const dashboardTitle = document.querySelector('.dashboard-title');
+            
+            viewOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    viewOptions.forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+                    
+                    const view = option.dataset.view;
+                    if (view === 'brand') {
+                        dashboardTitle.textContent = 'Brand Dashboard';
+                        document.getElementById('create-campaign').textContent = 'Create Campaign';
+                    } else {
+                        dashboardTitle.textContent = 'Influencer Dashboard';
+                        document.getElementById('create-campaign').textContent = 'Update Profile';
+                        alert("Influencer view would show your profile stats, available collaboration opportunities, and earnings dashboard. This is a demo of the dual-sided marketplace.");
+                    }
+                });
+            });
+            
+            // Mobile Preview Toggle
+            const desktopViewBtn = document.getElementById('desktop-view');
+            const mobileViewBtn = document.getElementById('mobile-view');
+            
+            desktopViewBtn.addEventListener('click', () => {
+                document.body.classList.remove('mobile-preview-active');
+                desktopViewBtn.classList.add('active');
+                mobileViewBtn.classList.remove('active');
+            });
+            
+            mobileViewBtn.addEventListener('click', () => {
+                document.body.classList.add('mobile-preview-active');
+                mobileViewBtn.classList.add('active');
+                desktopViewBtn.classList.remove('active');
+            });
+            
+            // Region and Country Filtering
+            const regionSelect = document.getElementById('region-select');
+            const countrySelect = document.getElementById('country-select');
+            
+            function filterInfluencers() {
+                const selectedRegion = regionSelect.value;
+                const selectedCountry = countrySelect.value;
+                
+                let filteredList = [...influencers];
+                
+                if (selectedRegion) {
+                    filteredList = filteredList.filter(inf => inf.region === selectedRegion);
+                }
+                
+                if (selectedCountry) {
+                    filteredList = filteredList.filter(inf => inf.country === selectedCountry);
+                }
+                
+                renderInfluencers(filteredList);
+            }
+            
+            regionSelect.addEventListener('change', filterInfluencers);
+            countrySelect.addEventListener('change', filterInfluencers);
+            
+            // Search functionality simulation
+            const searchBox = document.querySelector('.search-box');
+            searchBox.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                if (searchTerm.length > 2) {
+                    const filteredList = influencers.filter(inf => 
+                        inf.name.toLowerCase().includes(searchTerm) || 
+                        inf.handle.toLowerCase().includes(searchTerm) || 
+                        inf.category.toLowerCase().includes(searchTerm) ||
+                        inf.location.toLowerCase().includes(searchTerm) ||
+                        inf.tags.some(tag => tag.toLowerCase().includes(searchTerm))
+                    );
+                    renderInfluencers(filteredList);
+                } else if (searchTerm.length === 0) {
+                    renderInfluencers();
+                }
+            });
+            
+            // Filter simulation
+            const filters = document.querySelectorAll('.filter');
+            filters.forEach(filter => {
+                filter.addEventListener('click', () => {
+                    filters.forEach(f => f.classList.remove('active'));
+                    filter.classList.add('active');
+                    
+                    // For demo purposes, simulate filtering
+                    const filterText = filter.textContent.toLowerCase();
+                    let filteredList = [...influencers];
+                    
+                    if (filterText.includes('micro')) {
+                        filteredList = influencers.filter(inf => parseFloat(inf.followers) < 15);
+                    } else if (filterText.includes('mid-tier')) {
+                        filteredList = influencers.filter(inf => parseFloat(inf.followers) >= 15 && parseFloat(inf.followers) < 100);
+                    } else if (filterText.includes('macro')) {
+                        filteredList = influencers.filter(inf => parseFloat(inf.followers) >= 100);
+                    } else if (filterText.includes('local')) {
+                        filteredList = influencers.filter(inf => inf.country === 'usa');
+                    } else if (filterText.includes('global')) {
+                        filteredList = influencers.filter(inf => inf.country !== 'usa');
+                    }
+                    
+                    renderInfluencers(filteredList);
+                });
+            });
+            
+            // Create campaign button
+            const createCampaignBtn = document.getElementById('create-campaign');
+            createCampaignBtn.addEventListener('click', () => {
+                alert("Campaign Creation Wizard\n\n1. Set campaign goals\n2. Define target audience\n3. Select influencers\n4. Set budget\n5. Define deliverables\n6. Review and launch\n\nThis would open a step-by-step wizard in the full application.");
+            });
+            
+            // Quick Tour Button
+            const startTourBtn = document.getElementById('start-tour');
+            const tourOverlay = document.getElementById('tour-overlay');
+            const tourStep1 = document.getElementById('tour-step-1');
+            const tourSkipBtn = document.querySelector('.tour-skip');
+            const tourNextBtn = document.querySelector('.tour-next');
+            
+            startTourBtn.addEventListener('click', () => {
+                tourOverlay.style.display = 'block';
+                tourStep1.style.display = 'block';
+                tourStep1.style.top = '150px';
+                tourStep1.style.left = '50%';
+                tourStep1.style.transform = 'translateX(-50%)';
+            });
+            
+            tourSkipBtn.addEventListener('click', () => {
+                tourOverlay.style.display = 'none';
+                tourStep1.style.display = 'none';
+            });
+            
+            tourNextBtn.addEventListener('click', () => {
+                tourStep1.style.display = 'none';
+                alert("In the full application, the tour would continue to highlight key features: AI matching, analytics dashboard, campaign creation, and more.");
+                tourOverlay.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
