@@ -56,7 +56,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-left: 20px;
+            margin-right: 20px;
         }
 
         .toggle-label {
@@ -320,7 +320,7 @@
         }
 
         .step p {
-            color: var(--gray);
+            color: var (--gray);
             font-size: 16px;
             padding: 0 12px;
             transition: color 0.3s;
@@ -524,7 +524,7 @@
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 20px;
-            color: var(--secondary);
+            color: var (--secondary);
         }
 
         .footer-brand p {
@@ -696,6 +696,8 @@
                     <a href="#pricing">Pricing</a>
                     <a href="#testimonials">Testimonials</a>
                 </div>
+            </div>
+            <div class="auth-buttons" style="display: flex; align-items: center;">
                 <div class="toggle-container">
                     <i class="fas fa-sun"></i>
                     <label class="switch">
@@ -704,8 +706,6 @@
                     </label>
                     <i class="fas fa-moon"></i>
                 </div>
-            </div>
-            <div class="auth-buttons">
                 <a href="login.html" class="btn btn-secondary">Log In</a>
                 <a href="register.html" class="btn btn-primary">Sign Up</a>
             </div>
@@ -1006,21 +1006,45 @@
             // Dark Mode Toggle
             const themeToggle = document.getElementById('theme-toggle');
             
-            // Check if user has previously set a preference
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                themeToggle.checked = true;
-            }
-            
-            themeToggle.addEventListener('change', function() {
-                if (this.checked) {
+            // Function to set theme
+            const setTheme = (isDark) => {
+                if (isDark) {
                     document.documentElement.setAttribute('data-theme', 'dark');
-                    localStorage.setItem('theme', 'dark');
+                    themeToggle.checked = true;
                 } else {
                     document.documentElement.setAttribute('data-theme', 'light');
-                    localStorage.setItem('theme', 'light');
+                    themeToggle.checked = false;
                 }
+            };
+
+            // Check if user has previously set a preference
+            const savedTheme = localStorage.getItem('theme');
+            
+            if (savedTheme) {
+                // User has a saved preference, use it
+                setTheme(savedTheme === 'dark');
+            } else {
+                // No saved preference, check system preference
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                setTheme(prefersDark);
+                // Don't save to localStorage yet - this is just the default
+            }
+            
+            // Listen for changes to system preferences
+            const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            
+            darkModeMediaQuery.addEventListener('change', (e) => {
+                // Only apply if user hasn't manually set a preference
+                if (!localStorage.getItem('theme')) {
+                    setTheme(e.matches);
+                }
+            });
+            
+            // Listen for toggle changes (user preference)
+            themeToggle.addEventListener('change', function() {
+                const newTheme = this.checked ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
             });
         });
     </script>
